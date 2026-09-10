@@ -1,9 +1,4 @@
--- ============================================================
--- Chriki — seed.sql
--- Vérifié colonne par colonne contre schema.sql (groups.name,
--- expenses.id inclus). Données de test couvrant les scénarios
--- du cahier des charges.
--- ============================================================
+
 
 -- ============================================================
 -- 1. USERS (6)
