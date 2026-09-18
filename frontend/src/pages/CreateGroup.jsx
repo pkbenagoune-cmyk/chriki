@@ -1,14 +1,24 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/api';
 
 function CreateGroup() {
   const [name, setName] = useState('');
   const [type, setType] = useState('');
   const [defaultCurrency, setDefaultCurrency] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleCreateGroup = async (event) => {
     event.preventDefault();
+
+    if (loading) {
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const response = await api.post('/groups', {
@@ -18,8 +28,11 @@ function CreateGroup() {
       });
 
       console.log('Groupe créé avec succès', response.data);
+
+      navigate(`/groups/${response.data.id}`);
     } catch (error) {
       console.error('Erreur lors de la création du groupe', error);
+      setLoading(false);
     }
   };
 
@@ -65,8 +78,8 @@ function CreateGroup() {
           </select>
         </div>
 
-        <button type="submit">
-          Créer le groupe
+        <button type="submit" disabled={loading}>
+          {loading ? 'Création en cours...' : 'Créer le groupe'}
         </button>
 
       </form>

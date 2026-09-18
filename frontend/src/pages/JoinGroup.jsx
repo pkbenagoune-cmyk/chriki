@@ -1,20 +1,56 @@
+
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/api';
 
 function JoinGroup() {
   const [code, setCode] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const navigate = useNavigate();
 
   const handleJoinGroup = async (event) => {
     event.preventDefault();
 
+    if (loading) {
+      return;
+    }
+
+    setErrorMessage('');
+
+    const invitationCode = code.trim();
+
+    if (!invitationCode) {
+      setErrorMessage('Veuillez entrer un code d’invitation.');
+      return;
+    }
+
+    setLoading(true);
+
     try {
       const response = await api.post('/invitations/join', {
-        code: code
+        code: invitationCode
       });
 
-      console.log('Groupe rejoint avec succès', response.data);
+      console.log(
+        'Groupe rejoint avec succès',
+        response.data
+      );
+
+      navigate(`/groups/${response.data.group_id}`);
     } catch (error) {
-      console.error('Erreur lors de la tentative de rejoindre le groupe', error);
+      console.error(
+        'Erreur lors de la tentative de rejoindre le groupe',
+        error
+      );
+
+      setErrorMessage(
+        error.response?.data?.message ||
+        'Impossible de rejoindre le groupe.'
+      );
+
+      setLoading(false);
     }
   };
 
@@ -31,11 +67,22 @@ function JoinGroup() {
             type="text"
             value={code}
             onChange={(event) => setCode(event.target.value)}
+            placeholder="Exemple : 288C51"
+            disabled={loading}
           />
         </div>
 
-        <button type="submit">
-          Rejoindre le groupe
+        {errorMessage && (
+          <p>{errorMessage}</p>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+        >
+          {loading
+            ? 'Connexion au groupe...'
+            : 'Rejoindre le groupe'}
         </button>
 
       </form>
